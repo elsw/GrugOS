@@ -10,7 +10,7 @@ BIOS runs mandatory drivers, looks for boot signature 0x55AA from (USB, harddisk
 
 # Real mode development
 
-## Assembly
+## Assembly 8086
 General 16 bit registered ax,bx,cx,dx. Ah al refers to high and low bytes
 ```
 IP = program counter
@@ -21,7 +21,7 @@ SS = segment for the stack pointer
 ES = Extra segment
 ```
 
-SI = address for BIOS command routines like:
+SI = source index, address for BIOS command routines like:
 Lodsb - Load data  pointed to by DS+SI into al and increment si
 Cmp al, 0 - compare al to zero
 Je - optional jump
@@ -56,3 +56,84 @@ LBA, logical block address, newer and simpler style of addressing. Block address
 In real mode, int 13h is for disk operations
 
 https://www.ctyme.com/intr/rb-0607.htm
+
+# Protected mode
+
+https://wiki.osdev.org/Protected_Mode
+
+4GB addressable memory. 32 bit instructions and 32bit numbers
+
+Memory and hardware protection:
+ - Ring 0, Kernel access to ALL memory!
+ - Ring 1, device drivers
+ - Ring 2, device drivers
+ - Ring 3, User space for applications. Cannot modify kernel memory, cannot access hardware with asking kernel
+
+ Different memory schemes
+ - Segment registers are now selector registers
+ - Paging: remapping memory addresses
+
+ ## Selector memory scheme
+
+ selectors point to data structures and permission requirements
+
+ ## Paging schemes
+
+ - virtual addresses mapped to physical addresses
+ - Allows all programs to beleive they are using address 0
+ - Maps out all programs to physical memory
+
+ ## Running with GDB
+
+```
+gdb
+target remote | qemu-system-x86_64 -hda ./boot.bin -S -gdb stdio
+```
+Look at raw 
+```
+layout asm
+```
+Look at registers
+```
+info registers
+```
+
+
+## Assembly 32 bit registers
+
+Data registers: extended 32 bit versions. lower halfs still pointed to by ax,bx etc...
+```
+EAX
+EBX
+ECX
+EDX
+```
+Pointer registers:
+```
+IP - Instruction Pointer
+ESP - Extended Stack Pointer
+EBP - Extented Base pointer
+```
+Index Registers
+```
+ESI - Extended Source index
+EDI - Extended Destination Index
+```
+Control Registers
+```
+OF - Overflow Flag
+DF - Direction Flag
+IF - Interrupt Flag
+TF - Trap Flag
+SF - Sign Flag
+ZF - Zero Flag
+AF - Auxillery Carry Flag
+PR - Parity Flag
+CF - Carry Flag
+```
+Segment Registers (same as 16 bit)
+```
+CS - Code segment
+DS - Data Segment
+SS - Stack Segment
+```
