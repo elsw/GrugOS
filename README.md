@@ -87,7 +87,7 @@ Memory and hardware protection:
 
 ```
 gdb
-target remote | qemu-system-x86_64 -hda ./boot.bin -S -gdb stdio
+target remote | qemu-system-x86_64 -hda ./bin/boot.bin -S -gdb stdio
 ```
 Look at raw 
 ```
@@ -136,4 +136,62 @@ Segment Registers (same as 16 bit)
 CS - Code segment
 DS - Data Segment
 SS - Stack Segment
+```
+
+## A20 Access
+
+Some strange old compatability with the 8086, you must manually enable the 21st bit of the address line
+
+```
+in al, 0x92
+or al,2
+out 0x92,al
+```
+
+## Build Cross compiler
+
+https://wiki.osdev.org/GCC_Cross-Compiler
+
+```
+sudo apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo #libcloog-isl-dev libist-dev
+```
+
+Download bin utils and gcc
+
+build both
+```
+export PREFIX="$HOME/opt/cross"
+export TARGET=i686-elf
+export PATH="$PREFIX/bin:$PATH"
+```
+cd $HOME/src
+ 
+mkdir build-binutils
+cd build-binutils
+../binutils-x.y.z/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
+make
+make install
+```
+```
+cd $HOME/src
+ 
+# The $PREFIX/bin dir _must_ be in the PATH. We did that above.
+which -- $TARGET-as || echo $TARGET-as is not in the PATH
+ 
+mkdir build-gcc
+cd build-gcc
+../gcc-x.y.z/configure --target=$TARGET --prefix="$PREFIX" --disable-nls --enable-languages=c,c++ --without-headers
+make all-gcc
+make all-target-libgcc
+make install-gcc
+make install-target-libgcc
+```
+
+
+## Run GDB with symbols
+
+```
+add-symbol-file build/kernelfull.o 0x100000
+break _start
+target remote | qemu-system-x86_64 -S -gdb stdio -hda ./bin/os.bin
 ```
