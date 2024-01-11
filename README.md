@@ -190,8 +190,13 @@ make install-target-libgcc
 
 ## Run GDB with symbols
 
+running OS:
+```
+qemu-system-x86_64 -hda ./os.bin
+```
+
 ```
 add-symbol-file build/kernelfull.o 0x100000
-break _start
-target remote | qemu-system-x86_64 -S -gdb stdio -hda ./bin/os.bin
+target remote | qemu-system-x86_64 -S -gdb stdio -hda ./bin/os.bin -gbd stdio -S
+break kernel_main
 ```
