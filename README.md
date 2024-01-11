@@ -112,7 +112,7 @@ Pointer registers:
 ```
 IP - Instruction Pointer
 ESP - Extended Stack Pointer
-EBP - Extented Base pointer
+EBP - Extended Base pointer
 ```
 Index Registers
 ```

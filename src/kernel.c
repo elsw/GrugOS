@@ -17,13 +17,13 @@ void putchar(int x,int y,char c,char colour)
 
 void terminal_append_char(char c,char colour)
 {
-    if(c == '/n')
+    if(c == '\n')
     {
         terminal_row++;
         terminal_col = 0;
         return;
     }
-    
+
     putchar(terminal_col,terminal_row,c,colour);
     terminal_col++;
     if(terminal_col >= VGA_WIDTH)
@@ -57,7 +57,12 @@ size_t strlen(const char* str)
     return len;
 }
 
-void print(const char* str,const char colour)
+void print(const char *str)
+{
+    print_colour(str,5);
+}
+
+void print_colour(const char* str,const char colour)
 {
     size_t len = strlen(str);
     for(int i = 0 ; i < len ; i++)
@@ -69,5 +74,5 @@ void print(const char* str,const char colour)
 void kernel_main()
 {
     terminal_initialise();
-    print("Grug say ugg",5);
+    print_colour("Grug say ugg",5);
 }
